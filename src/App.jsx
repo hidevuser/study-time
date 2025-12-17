@@ -192,7 +192,7 @@ export const App = () => {
     <>
       <div className="p-4 sm:p-8 max-w-lg mx-auto bg-gray-50 min-h-screen">
         <h1 className="text-3xl font-extrabold text-indigo-700 mb-6 text-center">
-          学習時間記録テスト
+          学習時間記録
         </h1>
 
         <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 mb-8">
