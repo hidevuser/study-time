@@ -1,15 +1,42 @@
 import { useEffect, useRef, useState } from "react";
-import "./App.css";
 import { createClient } from "@supabase/supabase-js";
 
+// const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+// const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+// const getEnv = (key) => {
+//   // グローバルオブジェクト (window または globalThis) を取得
+//   const g = typeof window !== "undefined" ? window : globalThis;
+
+//   // 'import' と '.meta' を分離して参照することで解析エラーを物理的に回避します
+//   const importProp = "import";
+//   const metaProp = "meta";
+//   const meta = g[importProp] ? g[importProp][metaProp] : null;
+
+//   if (meta && meta.env) {
+//     return meta.env[key];
+//   }
+
+//   // Node.js (Jest) 環境用のフォールバック
+//   // Jest実行時に process.env.VITE_SUPABASE_URL などに値をセットしておく必要があります
+//   return typeof process !== "undefined" && process.env
+//     ? process.env[key]
+//     : null;
+// };
+
+/**
+ * ★ 呼び出し側の修正:
+ * 引数に直接 `import.meta.env...` を書くとそこでエラーになるため、
+ * 必ず文字列 ('VITE_SUPABASE_URL') で渡すように修正しました。
+ */
+// const SUPABASE_URL = getEnv("VITE_SUPABASE_URL");
+// const SUPABASE_ANON_KEY = getEnv("VITE_SUPABASE_ANON_KEY");
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const tableName = "records";
 
 // 設定がプレースホルダーかどうかを判定するフラグ
-const isConfigMissing =
-  SUPABASE_URL === import.meta.env.VITE_SUPABASE_URL ||
-  SUPABASE_ANON_KEY === import.meta.env.VITE_SUPABASE_ANON_KEY;
+const isConfigMissing = SUPABASE_URL || SUPABASE_ANON_KEY;
 
 // Supabaseクライアントの初期化（設定が正しく行われている場合のみ）
 const initializeSupabaseClient = () => {
@@ -29,6 +56,7 @@ const supabaseClient = initializeSupabaseClient();
 
 // クライアントが利用可能かどうかのフラグ
 const isSupabaseReady = supabaseClient && isConfigMissing;
+console.log(isSupabaseReady);
 
 export const App = () => {
   const [content, setContent] = useState("");
@@ -99,7 +127,7 @@ export const App = () => {
       setRecords(data || []);
     } catch (e) {
       console.error("Fetch Error:", e.message);
-      setDbError(`🚨 データ取得エラー: ${e.message}`);
+      setDbError(`🚨 データ取得エラー: ${e}`);
     } finally {
       setIsLoading(false);
     }
@@ -108,7 +136,6 @@ export const App = () => {
   // 初期ロードはクライアントが初期化された後に一度だけ実行
   useEffect(() => {
     if (isSupabaseReady) {
-      console.log("fetchRecords");
       fetchRecords();
     } else {
       setIsLoading(false);
@@ -275,6 +302,7 @@ export const App = () => {
             className="bg-indigo-600 text-white p-2.5 rounded-lg w-full font-bold hover:bg-indigo-700 transition shadow-md"
             onClick={register}
             disabled={isLoading || !isSupabaseReady}
+            
           >
             {isLoading ? "ロード中..." : "🚀 登録"}
           </button>
